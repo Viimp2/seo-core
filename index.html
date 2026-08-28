@@ -1,0 +1,674 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow, noarchive">
+</head>
+<body>
+<title>Семантическое ядро roomora.ai</title>
+<style id="app-css">
+:root{
+  --bg:#FBFAF7; --bg-soft:#F5F2EC; --surface:#FFFFFF;
+  --ink:#11151E; --ink-2:#3F4756; --ink-3:#6B7382;
+  --line:rgba(17,21,30,.09); --line-2:rgba(17,21,30,.05);
+  --accent:#F25C2B; --accent-soft:rgba(242,92,43,.10); --accent-bar:rgba(242,92,43,.13);
+  --pick:rgba(242,92,43,.055);
+  --shadow:0 1px 0 rgba(17,21,30,.04), 0 4px 12px rgba(60,40,25,.05), 0 24px 48px rgba(60,40,25,.045);
+  --sans:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  --serif:"Iowan Old Style","Palatino Linotype",Palatino,"Times New Roman",Georgia,serif;
+}
+@media (prefers-color-scheme:dark){:root{
+  --bg:#0A0E1A; --bg-soft:#0C1120; --surface:#0F1729;
+  --ink:#F1F5FB; --ink-2:#B4BECD; --ink-3:#8792A4;
+  --line:rgba(241,245,251,.12); --line-2:rgba(241,245,251,.06);
+  --accent:#FF7A4D; --accent-soft:rgba(255,122,77,.14); --accent-bar:rgba(255,122,77,.16);
+  --pick:rgba(255,122,77,.07);
+  --shadow:0 1px 0 rgba(0,0,0,.4), 0 4px 14px rgba(0,0,0,.34), 0 24px 56px rgba(0,0,0,.34);
+}}
+:root[data-theme="dark"]{
+  --bg:#0A0E1A; --bg-soft:#0C1120; --surface:#0F1729;
+  --ink:#F1F5FB; --ink-2:#B4BECD; --ink-3:#8792A4;
+  --line:rgba(241,245,251,.12); --line-2:rgba(241,245,251,.06);
+  --accent:#FF7A4D; --accent-soft:rgba(255,122,77,.14); --accent-bar:rgba(255,122,77,.16);
+  --pick:rgba(255,122,77,.07);
+  --shadow:0 1px 0 rgba(0,0,0,.4), 0 4px 14px rgba(0,0,0,.34), 0 24px 56px rgba(0,0,0,.34);
+}
+:root[data-theme="light"]{
+  --bg:#FBFAF7; --bg-soft:#F5F2EC; --surface:#FFFFFF;
+  --ink:#11151E; --ink-2:#3F4756; --ink-3:#6B7382;
+  --line:rgba(17,21,30,.09); --line-2:rgba(17,21,30,.05);
+  --accent:#F25C2B; --accent-soft:rgba(242,92,43,.10); --accent-bar:rgba(242,92,43,.13);
+  --pick:rgba(242,92,43,.055);
+  --shadow:0 1px 0 rgba(17,21,30,.04), 0 4px 12px rgba(60,40,25,.05), 0 24px 48px rgba(60,40,25,.045);
+}
+
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);
+  font-size:15px;line-height:1.5;-webkit-font-smoothing:antialiased}
+.wrap{max-width:1180px;margin:0 auto;padding:0 24px}
+
+/* ---------- header ---------- */
+.masthead{padding:56px 0 26px}
+.eyebrow{font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink-3);
+  display:flex;align-items:center;gap:10px}
+.dot{width:7px;height:7px;border-radius:50%;background:var(--accent);animation:pulse 2.4s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.45;transform:scale(.78)}}
+h1{font-size:clamp(34px,5vw,54px);line-height:1.02;letter-spacing:-.04em;margin:18px 0 0;
+  font-weight:640;text-wrap:balance;max-width:15ch}
+h1 em{font-family:var(--serif);font-style:italic;font-weight:400;letter-spacing:-.02em}
+.lede{margin:16px 0 0;max-width:58ch;color:var(--ink-2);font-size:16.5px;line-height:1.55}
+.meta{margin-top:20px;display:flex;flex-wrap:wrap;gap:8px 18px;font-size:12.5px;color:var(--ink-3)}
+.meta b{color:var(--ink-2);font-weight:600;font-variant-numeric:tabular-nums}
+
+/* ---------- briefing ---------- */
+.brief{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px;margin:34px 0 8px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:22px 24px;
+  box-shadow:var(--shadow)}
+.card h3{margin:0 0 8px;font-size:15px;letter-spacing:-.01em;font-weight:640}
+.card p{margin:0;color:var(--ink-2);font-size:13.5px;line-height:1.55}
+.card .big{font-family:var(--serif);font-style:italic;font-size:30px;color:var(--accent);
+  display:block;line-height:1;margin-bottom:10px;font-variant-numeric:tabular-nums}
+
+.note{background:var(--bg-soft);border:1px solid var(--line-2);border-radius:14px;
+  padding:18px 22px;margin:16px 0 0;font-size:13.5px;color:var(--ink-2);line-height:1.6}
+.note b{color:var(--ink)}
+
+/* ---------- sticky bar ---------- */
+.bar{position:sticky;top:0;z-index:40;background:var(--bg);
+  border-bottom:1px solid var(--line);margin-top:38px}
+.bar-in{display:flex;align-items:center;gap:14px;padding:12px 0;flex-wrap:wrap}
+.tabs{display:flex;gap:2px;background:var(--bg-soft);border:1px solid var(--line-2);
+  border-radius:999px;padding:3px}
+.tab{border:0;background:transparent;color:var(--ink-3);font:inherit;font-size:13px;font-weight:600;
+  padding:6px 15px;border-radius:999px;cursor:pointer;transition:color .2s cubic-bezier(.22,1,.36,1)}
+.tab[aria-selected="true"]{background:var(--surface);color:var(--ink);box-shadow:0 1px 3px rgba(17,21,30,.09)}
+.search{flex:1;min-width:180px;position:relative}
+.search input{width:100%;border:1px solid var(--line);background:var(--surface);color:var(--ink);
+  border-radius:999px;padding:9px 16px 9px 36px;font:inherit;font-size:13.5px}
+.search svg{position:absolute;left:13px;top:50%;transform:translateY(-50%);opacity:.4}
+.search input:focus{outline:2px solid var(--accent);outline-offset:1px}
+.btn{border:1px solid var(--line);background:var(--surface);color:var(--ink);font:inherit;font-size:13px;
+  font-weight:560;padding:8px 15px;border-radius:999px;cursor:pointer;display:inline-flex;align-items:center;
+  gap:7px;transition:box-shadow .2s cubic-bezier(.22,1,.36,1),transform .2s cubic-bezier(.22,1,.36,1)}
+.btn:hover{box-shadow:0 2px 8px rgba(17,21,30,.10)}
+.btn:active{transform:translateY(1px)}
+.btn:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.btn.on{background:var(--accent);border-color:var(--accent);color:#fff}
+.btn.primary{background:var(--ink);border-color:var(--ink);color:var(--bg)}
+.tally{display:flex;align-items:baseline;gap:8px;font-size:13px;color:var(--ink-3);
+  font-variant-numeric:tabular-nums;white-space:nowrap}
+.tally b{font-size:16px;color:var(--ink);font-weight:640}
+.tally .acc{color:var(--accent)}
+
+/* ---------- ledger ---------- */
+.cluster{margin:44px 0 0}
+.cluster-head{display:flex;align-items:flex-start;gap:16px;margin-bottom:2px;
+  padding-bottom:12px;border-bottom:1px solid var(--line)}
+.cluster-letter{font-family:var(--serif);font-style:italic;font-size:34px;line-height:.9;
+  color:transparent;-webkit-text-stroke:1px var(--ink-3);flex:none;width:38px;padding-top:2px}
+.cluster-head h2{margin:0;font-size:19px;letter-spacing:-.02em;font-weight:640}
+.cluster-head p{margin:5px 0 0;color:var(--ink-3);font-size:13px;max-width:66ch;line-height:1.5}
+.cluster-sum{margin-left:auto;text-align:right;font-size:12px;color:var(--ink-3);
+  font-variant-numeric:tabular-nums;white-space:nowrap;flex:none}
+.cluster-sum b{display:block;font-size:15px;color:var(--ink-2);font-weight:640}
+
+.colhead{display:grid;align-items:center;gap:12px;padding:9px 12px 7px;
+  font-size:10.5px;letter-spacing:.11em;text-transform:uppercase;color:var(--ink-3)}
+.row{display:grid;align-items:center;gap:12px;padding:11px 12px;border-radius:11px;
+  position:relative;cursor:pointer;isolation:isolate;
+  transition:background .18s cubic-bezier(.22,1,.36,1)}
+.colhead,.row{grid-template-columns:22px minmax(150px,1.5fr) 86px 86px 62px 74px minmax(0,1.35fr)}
+.row+.row{box-shadow:inset 0 1px 0 var(--line-2)}
+.row::before{content:"";position:absolute;inset:0;z-index:-1;border-radius:11px;
+  background:linear-gradient(90deg,var(--accent-bar),transparent);
+  width:var(--bar,0%);opacity:.55;transition:opacity .2s}
+.row:hover{background:var(--bg-soft)}
+.row.picked{background:var(--pick);box-shadow:inset 2px 0 0 var(--accent)}
+.row.picked::before{opacity:.85}
+.row:focus-visible{outline:2px solid var(--accent);outline-offset:-2px}
+.box{width:19px;height:19px;border:1.5px solid var(--ink-3);border-radius:6px;flex:none;
+  display:grid;place-items:center;transition:all .2s cubic-bezier(.22,1,.36,1)}
+.row.picked .box{background:var(--accent);border-color:var(--accent)}
+.box svg{opacity:0;transform:scale(.6);transition:all .2s cubic-bezier(.22,1,.36,1)}
+.row.picked .box svg{opacity:1;transform:scale(1)}
+.kw{font-size:14.5px;letter-spacing:-.006em;overflow-wrap:anywhere}
+.row.picked .kw{font-weight:600}
+.num{font-variant-numeric:tabular-nums;font-size:13.5px;color:var(--ink-2);text-align:right}
+.num.lead{color:var(--ink);font-weight:600}
+.num.mute{color:var(--ink-3);font-size:12.5px}
+.chip{font-size:11px;padding:3px 9px;border-radius:999px;border:1px solid var(--line);
+  color:var(--ink-3);text-align:center;justify-self:start;white-space:nowrap}
+.chip.hi{border-color:color-mix(in srgb,var(--accent) 40%,transparent);color:var(--accent)}
+.rnote{font-size:12.5px;color:var(--ink-3);line-height:1.45}
+.rnote em{font-style:normal;color:var(--accent);font-weight:560}
+
+.empty{padding:40px 12px;color:var(--ink-3);font-size:14px}
+
+/* ---------- footer sections ---------- */
+.section{margin:60px 0 0}
+.section h2{font-size:24px;letter-spacing:-.03em;margin:0 0 6px;font-weight:640}
+.section h2 em{font-family:var(--serif);font-style:italic;font-weight:400}
+.section > p{color:var(--ink-2);max-width:64ch;margin:0 0 20px;font-size:14.5px}
+.maplist{display:grid;gap:1px;background:var(--line);border:1px solid var(--line);
+  border-radius:14px;overflow:hidden}
+.maprow{display:grid;grid-template-columns:minmax(140px,1fr) minmax(120px,1.4fr) 92px;gap:14px;
+  background:var(--surface);padding:13px 18px;align-items:center;font-size:13.5px}
+.maprow code{font-size:13px;color:var(--accent);font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
+.maprow span{color:var(--ink-3)}
+.maprow b{text-align:right;font-variant-numeric:tabular-nums;color:var(--ink)}
+.maprow.head{background:var(--bg-soft);font-size:10.5px;letter-spacing:.11em;text-transform:uppercase;color:var(--ink-3)}
+.maprow.head b{color:var(--ink-3);font-weight:500}
+
+footer{margin:70px 0 90px;padding-top:26px;border-top:1px solid var(--line);
+  color:var(--ink-3);font-size:12.5px;line-height:1.6}
+
+/* ---------- toast ---------- */
+.toast{position:fixed;left:50%;bottom:26px;transform:translate(-50%,14px);z-index:90;
+  background:var(--ink);color:var(--bg);padding:11px 20px;border-radius:999px;font-size:13.5px;
+  box-shadow:var(--shadow);opacity:0;pointer-events:none;
+  transition:all .3s cubic-bezier(.22,1,.36,1)}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+
+@media (max-width:900px){
+  .colhead,.row{grid-template-columns:22px minmax(120px,1.4fr) 78px 78px 58px}
+  .colhead .c-comp,.row .chip,.colhead .c-note,.row .rnote{display:none}
+}
+@media (max-width:620px){
+  .wrap{padding:0 16px}
+  .masthead{padding:36px 0 20px}
+  .colhead,.row{grid-template-columns:22px minmax(0,1fr) 74px 60px}
+  .colhead .c-world,.row .c-world{display:none}
+  .cluster-sum{display:none}
+  .bar-in{gap:10px}
+  .maprow{grid-template-columns:1fr;gap:4px}
+  .maprow b{text-align:left}
+}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+
+/* русская вкладка: колонки «мир» нет */
+[data-lang="ru"] .colhead,[data-lang="ru"] .row{
+  grid-template-columns:22px minmax(150px,1.5fr) 104px 62px 74px minmax(0,1.35fr)}
+[data-lang="ru"] .c-world{display:none}
+@media (max-width:900px){
+  [data-lang="ru"] .colhead,[data-lang="ru"] .row{grid-template-columns:22px minmax(120px,1.4fr) 78px 58px}
+}
+@media (max-width:620px){
+  [data-lang="ru"] .colhead,[data-lang="ru"] .row{grid-template-columns:22px minmax(0,1fr) 74px 60px}
+}
+.cluster-all{border:0;background:transparent;color:var(--ink-3);font:inherit;font-size:11.5px;
+  cursor:pointer;padding:4px 8px;border-radius:8px;text-decoration:underline;text-underline-offset:3px;
+  text-decoration-color:var(--line)}
+.cluster-all:hover{color:var(--accent)}
+.cluster-all:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+.status{font-size:12px;color:var(--ink-3);display:inline-flex;align-items:center;gap:6px;white-space:nowrap}
+.status i{width:6px;height:6px;border-radius:50%;background:var(--ink-3);font-style:normal;flex:none}
+.status.live i{background:var(--accent)}
+.status.saving i{background:var(--accent);animation:pulse 1s ease-in-out infinite}
+
+#banner{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-top:22px;
+  background:var(--accent-soft);border:1px solid color-mix(in srgb,var(--accent) 28%,transparent);
+  border-radius:14px;padding:14px 18px;font-size:13.5px;color:var(--ink-2)}
+#banner b{color:var(--ink);font-variant-numeric:tabular-nums}
+#banner span{flex:1;min-width:220px}
+#banner .btn{background:var(--surface)}
+
+</style>
+<div id="root"></div>
+<script id="app-data" type="application/json">{"en": {"clusters": [{"id": "A. Ядро: AI-редизайн интерьера", "desc": "Точное совпадение с продуктом. Главные коммерческие страницы."}, {"id": "B. Приложение и софт", "desc": "Здесь сидят Planner 5D, Homestyler, Coohom. Конкуренция выше, объём больше."}, {"id": "C. Планировки (фича Floor plan)", "desc": "Самый крупный небрендовый кластер ниши. Фича в бете, страницы под неё нет."}, {"id": "D. Экстерьер и фасад (фича Exterior)", "desc": "Вторая ваша фича. Без своей страницы трафик уходит целиком в интерьер."}, {"id": "E. Virtual staging (риелторы)", "desc": "Отдельная аудитория с деньгами. Самый дорогой клик и самая понятная окупаемость."}, {"id": "F. Стили интерьера (контент)", "desc": "130+ стилей — под каждый популярный делается галерея с кнопкой «примерить на своей комнате»."}, {"id": "G. Идеи по комнатам (верх воронки)", "desc": "Информационный трафик под галерею. Конверсия ниже, объём огромный."}, {"id": "H. Бренды конкурентов (страницы alternatives)", "desc": "Люди ищут решение по имени. Но проверьте раздел «что не берём» — приём здесь почти не работает."}, {"id": "I. Смежные ниши (кандидаты в фичи)", "desc": "Спрос есть, продукта пока нет. Повод расширить генерацию."}], "rows": [{"c": "A. Ядро: AI-редизайн интерьера", "k": "ai interior design", "cpc": 3.64, "comp": "высокая", "n": "главный ключ ниши", "w": 22200, "u": 6600}, {"c": "A. Ядро: AI-редизайн интерьера", "k": "ai home design", "cpc": 3.52, "comp": "высокая", "n": "", "w": 33100, "u": 6600}, {"c": "A. Ядро: AI-редизайн интерьера", "k": "home design ai", "cpc": 4.32, "comp": "средняя", "n": "тот же интент, другой порядок слов", "w": 90500, "u": 3600}, {"c": "A. Ядро: AI-редизайн интерьера", "k": "ai room design", "cpc": 3.5, "comp": "высокая", "n": "", "w": 27100, "u": 8100}, {"c": "A. Ядро: AI-редизайн интерьера", "k": "ai room design free", "cpc": 3.22, "comp": "высокая", "n": "бесплатный интент — вести на free-триал", "w": 22200, "u": 9900}, {"c": "A. Ядро: AI-редизайн интерьера", "k": "ai interior design free", "cpc": 3.16, "comp": "высокая", "n": "то же", "w": 14800, "u": 4400}, {"c": "A. Ядро: AI-редизайн интерьера", "k": "interior ai", "cpc": 4.35, "comp": "средняя", "n": "полубрендовый: часть трафика ищет interiorai.com", "w": 22200, "u": 1900}, {"c": "A. Ядро: AI-редизайн интерьера", "k": "ai house design", "cpc": 2.7, "comp": "средняя", "n": "", "w": 8100, "u": 1600}, {"c": "A. Ядро: AI-редизайн интерьера", "k": "ai room designer", "cpc": 3.14, "comp": "средняя", "n": "", "w": 3600, "u": 1300}, {"c": "A. Ядро: AI-редизайн интерьера", "k": "ai room decorator", "cpc": 3.3, "comp": "высокая", "n": "", "w": 5400, "u": 2400}, {"c": "A. Ядро: AI-редизайн интерьера", "k": "room redesign ai", "cpc": 3.33, "comp": "средняя", "n": "", "w": 9900, "u": 1600}, {"c": "A. Ядро: AI-редизайн интерьера", "k": "ai interior design app", "cpc": 4.47, "comp": "средняя", "n": "интент «приложение» — важен, если будет мобилка", "w": 2400, "u": 1300}, {"c": "A. Ядро: AI-редизайн интерьера", "k": "ai interior designer", "cpc": 3.96, "comp": "средняя", "n": "", "w": 1300, "u": 480}, {"c": "A. Ядро: AI-редизайн интерьера", "k": "ai for interior design", "cpc": 4.36, "comp": "средняя", "n": "инфо-интент, под статью", "w": 6600, "u": 1300}, {"c": "A. Ядро: AI-редизайн интерьера", "k": "interior design from photo", "cpc": 4.21, "comp": "средняя", "n": "буквально наш UX: фото → редизайн", "w": 6600, "u": 1300}, {"c": "A. Ядро: AI-редизайн интерьера", "k": "ai decoration", "cpc": 3.15, "comp": "средняя", "n": "", "w": 6600, "u": 2900}, {"c": "A. Ядро: AI-редизайн интерьера", "k": "ai room planner", "cpc": 3.7, "comp": "средняя", "n": "", "w": 12100, "u": 1900}, {"c": "A. Ядро: AI-редизайн интерьера", "k": "chatgpt interior design", "cpc": 2.22, "comp": "средняя", "n": "сравнение с ChatGPT — сильная статья", "w": 4400, "u": 1000}, {"c": "A. Ядро: AI-редизайн интерьера", "k": "interior design generator", "cpc": 3.45, "comp": "средняя", "n": "", "w": 590, "u": 210}, {"c": "B. Приложение и софт", "k": "interior design app", "cpc": 4.02, "comp": "средняя", "n": "", "w": 18100, "u": 6600}, {"c": "B. Приложение и софт", "k": "room design app", "cpc": 2.88, "comp": "средняя", "n": "", "w": 14800, "u": 6600}, {"c": "B. Приложение и софт", "k": "home design app", "cpc": 2.97, "comp": "средняя", "n": "", "w": 14800, "u": 6600}, {"c": "B. Приложение и софт", "k": "interior design software", "cpc": 10.82, "comp": "низкая", "n": "CPC $10.8 — дорогой коммерческий интент", "w": 14800, "u": 6600}, {"c": "B. Приложение и софт", "k": "interior design app free", "cpc": 2.05, "comp": "средняя", "n": "", "w": 12100, "u": 4400}, {"c": "B. Приложение и софт", "k": "room design app free", "cpc": 2.23, "comp": "средняя", "n": "", "w": 8100, "u": 4400}, {"c": "B. Приложение и софт", "k": "room designer free", "cpc": 2.71, "comp": "средняя", "n": "", "w": 8100, "u": 4400}, {"c": "B. Приложение и софт", "k": "home design app free", "cpc": 1.93, "comp": "средняя", "n": "", "w": 6600, "u": 2900}, {"c": "B. Приложение и софт", "k": "best interior design apps", "cpc": 5.4, "comp": "средняя", "n": "подборочный интент — своя статья-рейтинг", "w": 4400, "u": 1900}, {"c": "B. Приложение и софт", "k": "decorating apps", "cpc": 3.24, "comp": "низкая", "n": "", "w": 9900, "u": 1900}, {"c": "B. Приложение и софт", "k": "app decorate room", "cpc": 2.94, "comp": "средняя", "n": "", "w": 4400, "u": 2400}, {"c": "B. Приложение и софт", "k": "home designer", "cpc": 6.03, "comp": "низкая", "n": "", "w": 12100, "u": 4400}, {"c": "B. Приложение и софт", "k": "room design 3d", "cpc": 2.46, "comp": "средняя", "n": "", "w": 14800, "u": 4400}, {"c": "B. Приложение и софт", "k": "3d room design free", "cpc": 1.96, "comp": "средняя", "n": "", "w": 9900, "u": 2900}, {"c": "B. Приложение и софт", "k": "interior design 3d", "cpc": 7.33, "comp": "средняя", "n": "", "w": 6600, "u": 480}, {"c": "B. Приложение и софт", "k": "room design program", "cpc": 3.7, "comp": "средняя", "n": "", "w": 2900, "u": 1600}, {"c": "B. Приложение и софт", "k": "interior design programs", "cpc": 18.78, "comp": "средняя", "n": "CPC $18.8", "w": 4400, "u": 2900}, {"c": "B. Приложение и софт", "k": "home reno app", "cpc": 3.55, "comp": "средняя", "n": "", "w": 2900, "u": 1900}, {"c": "B. Приложение и софт", "k": "house remodel app", "cpc": 3.55, "comp": "средняя", "n": "", "w": 2900, "u": 1900}, {"c": "B. Приложение и софт", "k": "home design 3d", "cpc": 3.67, "comp": "средняя", "n": "во многом брендовый: приложение Home Design 3D", "w": 40500, "u": 2900}, {"c": "B. Приложение и софт", "k": "kitchen design app", "cpc": 3.36, "comp": "высокая", "n": "", "w": 6600, "u": 2400}, {"c": "B. Приложение и софт", "k": "bedroom design app", "cpc": 2.94, "comp": "средняя", "n": "", "w": 3600, "u": 1300}, {"c": "B. Приложение и софт", "k": "bathroom design app", "cpc": 3.74, "comp": "средняя", "n": "", "w": 1900, "u": 880}, {"c": "C. Планировки (фича Floor plan)", "k": "floor plan creator", "cpc": 4.41, "comp": "низкая", "n": "крупнейший небрендовый ключ во всей нише", "w": 110000, "u": 40500}, {"c": "C. Планировки (фича Floor plan)", "k": "free floor plan creator", "cpc": 3.77, "comp": "средняя", "n": "", "w": 27100, "u": 12100}, {"c": "C. Планировки (фича Floor plan)", "k": "ai floor plan generator", "cpc": 3.67, "comp": "средняя", "n": "точное совпадение с фичей", "w": 14800, "u": 1900}, {"c": "C. Планировки (фича Floor plan)", "k": "ai floor plan generator free", "cpc": 3.47, "comp": "средняя", "n": "", "w": 6600, "u": 880}, {"c": "C. Планировки (фича Floor plan)", "k": "floor plan maker online free", "cpc": 4.09, "comp": "средняя", "n": "", "w": 6600, "u": 2400}, {"c": "C. Планировки (фича Floor plan)", "k": "floor plan builder", "cpc": 3.53, "comp": "средняя", "n": "", "w": 3600, "u": 1900}, {"c": "C. Планировки (фича Floor plan)", "k": "online floor plan creator", "cpc": 5.27, "comp": "средняя", "n": "", "w": 3600, "u": 1000}, {"c": "C. Планировки (фича Floor plan)", "k": "house floor plan creator", "cpc": 2.79, "comp": "средняя", "n": "", "w": 2900, "u": 1600}, {"c": "C. Планировки (фича Floor plan)", "k": "house plan creator", "cpc": 3.35, "comp": "средняя", "n": "", "w": 3600, "u": 880}, {"c": "C. Планировки (фича Floor plan)", "k": "blueprint maker", "cpc": 4.1, "comp": "средняя", "n": "", "w": 8100, "u": 4400}, {"c": "C. Планировки (фича Floor plan)", "k": "floorplanner free", "cpc": 4.82, "comp": "средняя", "n": "брендовый (floorplanner.com)", "w": 5400, "u": 1300}, {"c": "C. Планировки (фича Floor plan)", "k": "room planner app", "cpc": 1.9, "comp": "средняя", "n": "", "w": 6600, "u": 2400}, {"c": "D. Экстерьер и фасад (фича Exterior)", "k": "exterior home design", "cpc": 5.88, "comp": "высокая", "n": "", "w": 33100, "u": 3600}, {"c": "D. Экстерьер и фасад (фича Exterior)", "k": "exterior design", "cpc": 9.91, "comp": "низкая", "n": "CPC $9.9", "w": 9900, "u": 1600}, {"c": "D. Экстерьер и фасад (фича Exterior)", "k": "modern house exterior", "cpc": 6.79, "comp": "высокая", "n": "", "w": 5400, "u": 2900}, {"c": "D. Экстерьер и фасад (фича Exterior)", "k": "exterior paint design", "cpc": 0.83, "comp": "высокая", "n": "", "w": 8100, "u": 3600}, {"c": "D. Экстерьер и фасад (фича Exterior)", "k": "exterior house remodeling", "cpc": 20.88, "comp": "средняя", "n": "CPC $20.9 — самый дорогой клик в ядре", "w": 3600, "u": 2900}, {"c": "D. Экстерьер и фасад (фича Exterior)", "k": "house exterior design ideas", "cpc": 3.28, "comp": "высокая", "n": "", "w": 2400, "u": 590}, {"c": "D. Экстерьер и фасад (фича Exterior)", "k": "home exterior ideas", "cpc": 3.92, "comp": "высокая", "n": "", "w": 1000, "u": 880}, {"c": "D. Экстерьер и фасад (фича Exterior)", "k": "best exterior house color", "cpc": 1.5, "comp": "высокая", "n": "", "w": 12100, "u": 1900}, {"c": "D. Экстерьер и фасад (фича Exterior)", "k": "exterior paint color visualizer", "cpc": 2.66, "comp": "средняя", "n": "смежная фича: подбор цвета", "w": 3600, "u": 2900}, {"c": "D. Экстерьер и фасад (фича Exterior)", "k": "paint color visualizer", "cpc": 1.26, "comp": "средняя", "n": "", "w": 4400, "u": 2900}, {"c": "D. Экстерьер и фасад (фича Exterior)", "k": "paint visualizer", "cpc": 1.21, "comp": "средняя", "n": "", "w": 4400, "u": 3600}, {"c": "D. Экстерьер и фасад (фича Exterior)", "k": "house front design", "cpc": 4.55, "comp": "высокая", "n": "ОСТОРОЖНО: 90 500 в мире, но 1 300 в США — почти весь трафик из Индии", "w": 90500, "u": 1300}, {"c": "E. Virtual staging (риелторы)", "k": "virtual staging", "cpc": 12.28, "comp": "средняя", "n": "CPC $12.3", "w": 9900, "u": 4400}, {"c": "E. Virtual staging (риелторы)", "k": "virtual staging ai", "cpc": 11.5, "comp": "средняя", "n": "CPC $11.5, точное совпадение", "w": 6600, "u": 3600}, {"c": "E. Virtual staging (риелторы)", "k": "virtual staging software", "cpc": 13.65, "comp": "низкая", "n": "CPC $13.7", "w": 1000, "u": 720}, {"c": "E. Virtual staging (риелторы)", "k": "ai virtual staging", "cpc": 11.2, "comp": "средняя", "n": "CPC $11.2", "w": 1000, "u": 480}, {"c": "E. Virtual staging (риелторы)", "k": "free virtual staging", "cpc": 5.61, "comp": "средняя", "n": "", "w": 880, "u": 590}, {"c": "E. Virtual staging (риелторы)", "k": "home staging app", "cpc": 6.38, "comp": "средняя", "n": "", "w": 1000, "u": 260}, {"c": "F. Стили интерьера (контент)", "k": "japandi", "cpc": 3.28, "comp": "высокая", "n": "110 000 в мире, 22 200 в США — самый горячий стиль сезона", "w": 110000, "u": 22200}, {"c": "F. Стили интерьера (контент)", "k": "japandi interior design", "cpc": 2.28, "comp": "высокая", "n": "", "w": 18100, "u": 6600}, {"c": "F. Стили интерьера (контент)", "k": "scandinavian interior design", "cpc": 3.66, "comp": "средняя", "n": "", "w": 22200, "u": 6600}, {"c": "F. Стили интерьера (контент)", "k": "minimalist interior design", "cpc": 2.49, "comp": "низкая", "n": "", "w": 22200, "u": 9900}, {"c": "F. Стили интерьера (контент)", "k": "mid century modern interior", "cpc": 2.41, "comp": "высокая", "n": "", "w": 22200, "u": 6600}, {"c": "F. Стили интерьера (контент)", "k": "art deco interior design", "cpc": 2.07, "comp": "средняя", "n": "", "w": 18100, "u": 6600}, {"c": "F. Стили интерьера (контент)", "k": "boho interior design", "cpc": 1.18, "comp": "высокая", "n": "", "w": 12100, "u": 4400}, {"c": "F. Стили интерьера (контент)", "k": "industrial interior design", "cpc": 3.76, "comp": "средняя", "n": "", "w": 9900, "u": 2400}, {"c": "F. Стили интерьера (контент)", "k": "modern farmhouse interior", "cpc": 1.5, "comp": "высокая", "n": "", "w": 5400, "u": 2900}, {"c": "F. Стили интерьера (контент)", "k": "coastal interior design", "cpc": 2.65, "comp": "высокая", "n": "", "w": 3600, "u": 1600}, {"c": "G. Идеи по комнатам (верх воронки)", "k": "bathroom ideas", "cpc": 3.0, "comp": "высокая", "n": "", "w": 90500, "u": 27100}, {"c": "G. Идеи по комнатам (верх воронки)", "k": "room decor ideas", "cpc": 1.87, "comp": "высокая", "n": "", "w": 90500, "u": 12100}, {"c": "G. Идеи по комнатам (верх воронки)", "k": "living room ideas", "cpc": 1.62, "comp": "высокая", "n": "", "w": 74000, "u": 27100}, {"c": "G. Идеи по комнатам (верх воронки)", "k": "bedroom ideas", "cpc": 1.27, "comp": "высокая", "n": "", "w": 74000, "u": 18100}, {"c": "G. Идеи по комнатам (верх воронки)", "k": "kitchen ideas", "cpc": 2.1, "comp": "высокая", "n": "", "w": 60500, "u": 22200}, {"c": "G. Идеи по комнатам (верх воронки)", "k": "small kitchen ideas", "cpc": 1.28, "comp": "высокая", "n": "", "w": 60500, "u": 18100}, {"c": "G. Идеи по комнатам (верх воронки)", "k": "small living room ideas", "cpc": 1.06, "comp": "высокая", "n": "«маленькая комната» — наш сценарий", "w": 33100, "u": 12100}, {"c": "G. Идеи по комнатам (верх воронки)", "k": "small bedroom ideas", "cpc": 1.0, "comp": "высокая", "n": "", "w": 33100, "u": 9900}, {"c": "G. Идеи по комнатам (верх воронки)", "k": "living room design ideas", "cpc": 1.95, "comp": "высокая", "n": "", "w": 22200, "u": 6600}, {"c": "G. Идеи по комнатам (верх воронки)", "k": "interior design ideas", "cpc": 2.46, "comp": "высокая", "n": "", "w": 12100, "u": 3600}, {"c": "H. Бренды конкурентов (страницы alternatives)", "k": "houzz", "cpc": 7.9, "comp": "высокая", "n": "гигант, но интент «найти подрядчика», не наш", "w": 201000, "u": 110000}, {"c": "H. Бренды конкурентов (страницы alternatives)", "k": "planner 5d", "cpc": 3.28, "comp": "средняя", "n": "450 000 в мире — главный конкурент по трафику", "w": 450000, "u": 49500}, {"c": "H. Бренды конкурентов (страницы alternatives)", "k": "homestyler", "cpc": 2.55, "comp": "средняя", "n": "", "w": 201000, "u": 27100}, {"c": "H. Бренды конкурентов (страницы alternatives)", "k": "coohom", "cpc": 4.1, "comp": "средняя", "n": "", "w": 165000, "u": 6600}, {"c": "H. Бренды конкурентов (страницы alternatives)", "k": "roomstyler", "cpc": 2.32, "comp": "низкая", "n": "", "w": 27100, "u": 6600}, {"c": "H. Бренды конкурентов (страницы alternatives)", "k": "remodeled ai", "cpc": 3.8, "comp": "средняя", "n": "прямой AI-конкурент", "w": 18100, "u": 4400}, {"c": "H. Бренды конкурентов (страницы alternatives)", "k": "collov ai", "cpc": 14.26, "comp": "средняя", "n": "CPC $14.3 — активно закупают рекламу", "w": 18100, "u": 2400}, {"c": "H. Бренды конкурентов (страницы alternatives)", "k": "reroom ai", "cpc": 3.37, "comp": "средняя", "n": "прямой AI-конкурент", "w": 14800, "u": 1600}, {"c": "H. Бренды конкурентов (страницы alternatives)", "k": "decorilla", "cpc": 9.4, "comp": "средняя", "n": "услуга дизайнера, не софт", "w": 3600, "u": 1600}, {"c": "I. Смежные ниши (кандидаты в фичи)", "k": "landscape design app", "cpc": 2.91, "comp": "средняя", "n": "", "w": 5400, "u": 4400}, {"c": "I. Смежные ниши (кандидаты в фичи)", "k": "ai landscape design", "cpc": 3.28, "comp": "средняя", "n": "", "w": 5400, "u": 4400}, {"c": "I. Смежные ниши (кандидаты в фичи)", "k": "garden design app", "cpc": 2.23, "comp": "средняя", "n": "", "w": 4400, "u": 880}, {"c": "I. Смежные ниши (кандидаты в фичи)", "k": "free kitchen design software", "cpc": 4.85, "comp": "средняя", "n": "", "w": 3600, "u": 1600}]}, "ru": {"clusters": [{"id": "A. Ядро: нейросеть и ИИ", "desc": "Точный интент, цифры занижены. Кластер растущий — занимать сейчас, пока пусто."}, {"id": "B. Онлайн-дизайн и программы", "desc": "Основной коммерческий кластер: ищут инструмент, чтобы сделать самим."}, {"id": "C. Планировки и мебель", "desc": "Под фичу Floor plan. В рунете спрос устойчиво больше, чем на «дизайн по фото»."}, {"id": "D. Дизайн-проект и цена", "desc": "Интент студий. Бьём аргументом «вместо 60 000 ₽ за проект — $9 в месяц»."}, {"id": "E. Комнаты и типы квартир", "desc": "Верх воронки под галерею."}, {"id": "F. Стили", "desc": "Под те же 130+ стилей, что и в английской версии."}, {"id": "G. Хоумстейджинг и продажа", "desc": "Аналог virtual staging. Спрос заметный, конкуренции почти нет."}, {"id": "H. Фасад и участок", "desc": "Под фичу Exterior."}], "rows": [{"c": "A. Ядро: нейросеть и ИИ", "k": "ии дизайн интерьера", "cpc": 0.51, "comp": "низкая", "n": "", "u": 1300}, {"c": "A. Ядро: нейросеть и ИИ", "k": "ии для дизайна интерьера", "cpc": 0.72, "comp": "низкая", "n": "", "u": 1300}, {"c": "A. Ядро: нейросеть и ИИ", "k": "нейросеть для дизайна интерьера", "cpc": 0.69, "comp": "низкая", "n": "", "u": 720}, {"c": "A. Ядро: нейросеть и ИИ", "k": "нейросеть дизайн интерьера", "cpc": 0.41, "comp": "низкая", "n": "", "u": 210}, {"c": "A. Ядро: нейросеть и ИИ", "k": "дизайн комнаты по фото", "cpc": 0.27, "comp": "низкая", "n": "буквально наш UX", "u": 170}, {"c": "A. Ядро: нейросеть и ИИ", "k": "дизайн интерьера по фото", "cpc": 0.44, "comp": "низкая", "n": "", "u": 70}, {"c": "B. Онлайн-дизайн и программы", "k": "дизайн интерьера онлайн", "cpc": 0.5, "comp": "низкая", "n": "", "u": 1600}, {"c": "B. Онлайн-дизайн и программы", "k": "дизайн комнаты онлайн", "cpc": 0.35, "comp": "низкая", "n": "", "u": 1600}, {"c": "B. Онлайн-дизайн и программы", "k": "дизайн квартиры онлайн", "cpc": 0.54, "comp": "низкая", "n": "", "u": 1600}, {"c": "B. Онлайн-дизайн и программы", "k": "онлайн дизайн комнаты", "cpc": 0.38, "comp": "низкая", "n": "", "u": 720}, {"c": "B. Онлайн-дизайн и программы", "k": "дизайнер интерьера онлайн", "cpc": 0.5, "comp": "низкая", "n": "часть трафика ищет живого дизайнера", "u": 1600}, {"c": "B. Онлайн-дизайн и программы", "k": "программа для дизайна интерьера", "cpc": 0.51, "comp": "низкая", "n": "", "u": 1900}, {"c": "B. Онлайн-дизайн и программы", "k": "программа для дизайна интерьера бесплатно", "cpc": 0.37, "comp": "низкая", "n": "", "u": 720}, {"c": "B. Онлайн-дизайн и программы", "k": "приложение для дизайна интерьера", "cpc": 0.47, "comp": "низкая", "n": "", "u": 1000}, {"c": "B. Онлайн-дизайн и программы", "k": "дизайн интерьера 3d", "cpc": 0.7, "comp": "низкая", "n": "", "u": 1600}, {"c": "B. Онлайн-дизайн и программы", "k": "дизайн интерьера 3d онлайн бесплатно", "cpc": 0.28, "comp": "низкая", "n": "", "u": 880}, {"c": "B. Онлайн-дизайн и программы", "k": "визуализация интерьера", "cpc": 0.75, "comp": "низкая", "n": "", "u": 880}, {"c": "C. Планировки и мебель", "k": "конструктор кухни онлайн", "cpc": 0.4, "comp": "низкая", "n": "", "u": 3600}, {"c": "C. Планировки и мебель", "k": "планировка комнаты онлайн бесплатно", "cpc": 0.3, "comp": "низкая", "n": "", "u": 2900}, {"c": "C. Планировки и мебель", "k": "планировка квартиры онлайн", "cpc": 0.47, "comp": "низкая", "n": "", "u": 2400}, {"c": "C. Планировки и мебель", "k": "планировка комнаты онлайн", "cpc": 0.4, "comp": "низкая", "n": "", "u": 1600}, {"c": "C. Планировки и мебель", "k": "планировщик квартир", "cpc": 0.75, "comp": "низкая", "n": "", "u": 1300}, {"c": "C. Планировки и мебель", "k": "планировка дома онлайн", "cpc": 0.53, "comp": "низкая", "n": "", "u": 1300}, {"c": "C. Планировки и мебель", "k": "перепланировка онлайн", "cpc": 0.45, "comp": "низкая", "n": "", "u": 1000}, {"c": "C. Планировки и мебель", "k": "программа для планировки квартиры", "cpc": 0.34, "comp": "низкая", "n": "", "u": 880}, {"c": "C. Планировки и мебель", "k": "план квартиры онлайн бесплатно", "cpc": 0.45, "comp": "низкая", "n": "", "u": 720}, {"c": "C. Планировки и мебель", "k": "проект кухни онлайн", "cpc": 0.46, "comp": "низкая", "n": "", "u": 1900}, {"c": "C. Планировки и мебель", "k": "планировщик кухни онлайн", "cpc": 0.9, "comp": "низкая", "n": "", "u": 880}, {"c": "C. Планировки и мебель", "k": "расстановка мебели онлайн", "cpc": 0.52, "comp": "низкая", "n": "", "u": 590}, {"c": "C. Планировки и мебель", "k": "планировщик комнаты", "cpc": 0.31, "comp": "низкая", "n": "", "u": 260}, {"c": "D. Дизайн-проект и цена", "k": "дизайн проекты квартир", "cpc": 1.41, "comp": "низкая", "n": "", "u": 5400}, {"c": "D. Дизайн-проект и цена", "k": "дизайн проект квартиры онлайн", "cpc": 0.68, "comp": "низкая", "n": "", "u": 720}, {"c": "D. Дизайн-проект и цена", "k": "заказ дизайн проекта квартиры", "cpc": 1.7, "comp": "низкая", "n": "", "u": 880}, {"c": "D. Дизайн-проект и цена", "k": "сколько стоит дизайн проект квартиры", "cpc": 1.18, "comp": "низкая", "n": "идеальная страница-сравнение цен", "u": 1000}, {"c": "D. Дизайн-проект и цена", "k": "дизайн интерьера цена", "cpc": 1.5, "comp": "низкая", "n": "", "u": 320}, {"c": "D. Дизайн-проект и цена", "k": "дизайн ремонта квартир", "cpc": 1.13, "comp": "средняя", "n": "", "u": 720}, {"c": "E. Комнаты и типы квартир", "k": "дизайн кухни", "cpc": 0.33, "comp": "высокая", "n": "", "u": 22200}, {"c": "E. Комнаты и типы квартир", "k": "дизайн ванной комнаты", "cpc": 0.58, "comp": "высокая", "n": "", "u": 18100}, {"c": "E. Комнаты и типы квартир", "k": "дизайн спальни", "cpc": 0.39, "comp": "высокая", "n": "", "u": 12100}, {"c": "E. Комнаты и типы квартир", "k": "дизайн гостиной", "cpc": 0.5, "comp": "высокая", "n": "", "u": 4400}, {"c": "E. Комнаты и типы квартир", "k": "дизайн детской комнаты", "cpc": 0.68, "comp": "высокая", "n": "", "u": 2400}, {"c": "E. Комнаты и типы квартир", "k": "дизайн балкона", "cpc": 0.92, "comp": "низкая", "n": "", "u": 2400}, {"c": "E. Комнаты и типы квартир", "k": "дизайн однокомнатной квартиры", "cpc": 0.62, "comp": "средняя", "n": "", "u": 2400}, {"c": "E. Комнаты и типы квартир", "k": "дизайн маленькой квартиры", "cpc": 0.47, "comp": "средняя", "n": "", "u": 390}, {"c": "E. Комнаты и типы квартир", "k": "интерьеры квартир", "cpc": 1.0, "comp": "высокая", "n": "", "u": 2400}, {"c": "E. Комнаты и типы квартир", "k": "современный дизайн квартир", "cpc": 0.63, "comp": "высокая", "n": "", "u": 1600}, {"c": "F. Стили", "k": "скандинавский стиль в интерьере", "cpc": 0.49, "comp": "низкая", "n": "", "u": 4400}, {"c": "F. Стили", "k": "минимализм в интерьере", "cpc": 0.5, "comp": "средняя", "n": "", "u": 2400}, {"c": "F. Стили", "k": "неоклассика интерьер", "cpc": 0.36, "comp": "низкая", "n": "", "u": 720}, {"c": "F. Стили", "k": "лофт интерьер", "cpc": 0.0, "comp": "низкая", "n": "", "u": 590}, {"c": "F. Стили", "k": "бохо интерьер", "cpc": 0.0, "comp": "низкая", "n": "", "u": 590}, {"c": "F. Стили", "k": "японди", "cpc": 0.0, "comp": "низкая", "n": "в рунете стиль ещё не раскачался — 20; в EN 110 000", "u": 20}, {"c": "G. Хоумстейджинг и продажа", "k": "хоумстейджинг", "cpc": 1.04, "comp": "низкая", "n": "5 400 — неожиданно много для рунета", "u": 5400}, {"c": "G. Хоумстейджинг и продажа", "k": "предпродажная подготовка квартиры", "cpc": 0.0, "comp": "низкая", "n": "", "u": 90}, {"c": "H. Фасад и участок", "k": "дизайн дома снаружи", "cpc": 0.45, "comp": "низкая", "n": "", "u": 1000}, {"c": "H. Фасад и участок", "k": "дизайн фасада дома", "cpc": 0.61, "comp": "низкая", "n": "", "u": 480}, {"c": "H. Фасад и участок", "k": "ландшафтный дизайн онлайн", "cpc": 0.53, "comp": "низкая", "n": "", "u": 320}, {"c": "H. Фасад и участок", "k": "дизайн участка онлайн", "cpc": 0.0, "comp": "низкая", "n": "", "u": 50}]}}</script>
+<script id="app-state" type="application/json">{"picked":[],"by":{}}</script>
+<script id="app-js">
+(function(){
+"use strict";
+var DATA  = JSON.parse(document.getElementById("app-data").textContent);
+var PUB   = JSON.parse(document.getElementById("app-state").textContent);
+var LSKEY = "roomora-core-v1";
+
+/* ---------- состояние ---------- */
+var local = null;
+try { local = JSON.parse(localStorage.getItem(LSKEY) || "null"); } catch(e){}
+var state = (local && (local.rev|0) > (PUB.rev|0)) ? local : PUB;
+state = { rev: state.rev|0, picked: Array.isArray(state.picked) ? state.picked.slice() : [] };
+var picked = new Set(state.picked);
+
+var ui = { lang:"en", q:"", only:false };
+try { ui = Object.assign(ui, JSON.parse(sessionStorage.getItem(LSKEY+"-ui") || "{}")); } catch(e){}
+
+var artifact = null, mode = "local", timer = null;
+
+/* ---------- утилиты ---------- */
+function esc(s){ return String(s).replace(/[&<>"]/g, function(c){
+  return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]; }); }
+function fmt(n){ return String(n).replace(/\B(?=(\d{3})+(?!\d))/g, " "); }
+function id(lang,k){ return lang + ":" + k; }
+function rows(){ return DATA[ui.lang].rows; }
+function visible(r){
+  if (ui.only && !picked.has(id(ui.lang, r.k))) return false;
+  if (!ui.q) return true;
+  var q = ui.q.toLowerCase();
+  return r.k.toLowerCase().indexOf(q) >= 0 || (r.n||"").toLowerCase().indexOf(q) >= 0
+      || r.c.toLowerCase().indexOf(q) >= 0;
+}
+var CHECK = '<svg width="11" height="9" viewBox="0 0 11 9" fill="none" aria-hidden="true">'
+  + '<path d="M1 4.6L4 7.5L10 1.2" stroke="#fff" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+
+/* ---------- отрисовка ---------- */
+function ledger(){
+  var list = rows(), max = 1, i;
+  for (i=0;i<list.length;i++) if (list[i].u > max) max = list[i].u;
+  var lg = Math.log10(max + 1);
+  var out = [], shown = 0;
+
+  DATA[ui.lang].clusters.forEach(function(cl){
+    var items = list.filter(function(r){ return r.c === cl.id && visible(r); });
+    if (!items.length) return;
+    shown += items.length;
+    var sum = 0, npick = 0;
+    items.forEach(function(r){ sum += r.u; if (picked.has(id(ui.lang, r.k))) npick++; });
+    var allOn = npick === items.length;
+
+    out.push('<section class="cluster"><div class="cluster-head">'
+      + '<div class="cluster-letter" aria-hidden="true">' + esc(cl.id.charAt(0)) + '</div>'
+      + '<div><h2>' + esc(cl.id.replace(/^[A-Z]\.\s*/, "")) + '</h2><p>' + esc(cl.desc) + '</p>'
+      + '<button class="cluster-all" data-all="' + esc(cl.id) + '">'
+      + (allOn ? "снять весь кластер" : "выбрать весь кластер") + '</button></div>'
+      + '<div class="cluster-sum"><b>' + fmt(sum) + '</b>запросов/мес' + (ui.lang==="en" ? " в США" : "") + '</div>'
+      + '</div>');
+
+    out.push('<div class="colhead" aria-hidden="true"><span></span><span>Запрос</span>'
+      + '<span class="num c-world">Мир</span>'
+      + '<span class="num">' + (ui.lang==="en" ? "США" : "Мир без РФ") + '</span>'
+      + '<span class="num">CPC</span><span class="c-comp">Конк.</span><span class="c-note">Заметка</span></div>');
+
+    items.forEach(function(r){
+      var key = id(ui.lang, r.k), on = picked.has(key);
+      var w = Math.round(Math.log10(r.u + 1) / lg * 100);
+      out.push('<div class="row' + (on ? " picked" : "") + '" role="checkbox" tabindex="0"'
+        + ' aria-checked="' + on + '" data-k="' + esc(r.k) + '" style="--bar:' + w + '%">'
+        + '<span class="box">' + CHECK + '</span>'
+        + '<span class="kw">' + esc(r.k) + '</span>'
+        + '<span class="num mute c-world">' + (r.w != null ? fmt(r.w) : "") + '</span>'
+        + '<span class="num lead">' + fmt(r.u) + '</span>'
+        + '<span class="num mute">$' + r.cpc.toFixed(1) + '</span>'
+        + '<span class="chip' + (r.comp === "высокая" ? " hi" : "") + '">' + esc(r.comp) + '</span>'
+        + '<span class="rnote">' + esc(r.n || "") + '</span></div>');
+    });
+    out.push('</section>');
+  });
+
+  if (!shown) out.push('<div class="empty">Ничего не нашлось. Очистите поиск или снимите фильтр «только выбранные».</div>');
+  return out.join("");
+}
+
+function tally(){
+  var n = 0, v = 0;
+  rows().forEach(function(r){ if (picked.has(id(ui.lang, r.k))) { n++; v += r.u; } });
+  return { n:n, v:v };
+}
+
+function syncTally(){
+  var t = tally();
+  document.getElementById("tally").innerHTML =
+    '<b>' + t.n + '</b> из ' + rows().length + ' ключей<span class="acc">·</span><b class="acc">'
+    + fmt(t.v) + '</b> запросов/мес';
+}
+function syncRowEls(){
+  document.querySelectorAll(".row").forEach(function(el){
+    var on = picked.has(id(ui.lang, el.dataset.k));
+    el.classList.toggle("picked", on);
+    el.setAttribute("aria-checked", String(on));
+  });
+}
+function syncButtons(){
+  document.querySelectorAll(".cluster-all").forEach(function(b){
+    var items = rows().filter(function(r){ return r.c === b.dataset.all && visible(r); });
+    var on = items.length > 0 && items.every(function(r){ return picked.has(id(ui.lang, r.k)); });
+    b.textContent = on ? "снять весь кластер" : "выбрать весь кластер";
+  });
+}
+/* точечное обновление — не перестраивает список и не теряет фокус клавиатуры */
+function softPaint(){ syncRowEls(); syncButtons(); syncTally(); }
+
+function paint(){
+  document.documentElement.setAttribute("data-lang", ui.lang);
+  document.getElementById("ledger").innerHTML = ledger();
+  syncTally();
+  document.querySelectorAll(".tab").forEach(function(b){
+    b.setAttribute("aria-selected", String(b.dataset.lang === ui.lang)); });
+  document.getElementById("only").classList.toggle("on", ui.only);
+}
+
+function status(kind){
+  var el = document.getElementById("status");
+  el.className = "status" + (kind === "saving" ? " saving" : (kind === "live" ? " live" : ""));
+  el.innerHTML = '<i></i>' + (
+    kind === "saving" ? "сохраняю…" :
+    kind === "live"   ? "общая версия — видно всем" :
+    kind === "ro"     ? "только у вас — нет прав на общую версию" :
+                        "отметки сохранены в этом браузере");
+}
+
+/* ---------- сохранение ---------- */
+function persist(){
+  state.rev = (state.rev|0) + 1;
+  state.picked = Array.from(picked);
+  try { localStorage.setItem(LSKEY, JSON.stringify(state)); } catch(e){}
+  try { sessionStorage.setItem(LSKEY+"-ui", JSON.stringify(ui)); } catch(e){}
+  if (artifact) { status("saving"); clearTimeout(timer); timer = setTimeout(publish, 2200); }
+}
+
+function buildDoc(){
+  var css  = document.getElementById("app-css").textContent;
+  var js   = document.getElementById("app-js").textContent;
+  var data = document.getElementById("app-data").textContent;
+  var st   = JSON.stringify(state).replace(/</g, "\\u003c");
+  return '<!doctype html>\n<html lang="ru">\n<head>\n<meta charset="utf-8">\n'
+    + '<meta name="viewport" content="width=device-width, initial-scale=1">\n'
+    + '<title>Семантическое ядро roomora.ai</title>\n'
+    + '<style id="app-css">\n' + css + '\n</style>\n</head>\n<body>\n'
+    + '<div id="root"></div>\n'
+    + '<script id="app-data" type="application/json">' + data + '<\/script>\n'
+    + '<script id="app-state" type="application/json">' + st + '<\/script>\n'
+    + '<script id="app-js">\n' + js + '\n<\/script>\n</body>\n</html>';
+}
+
+function publish(){
+  if (!artifact) return;
+  try {
+    sessionStorage.setItem(LSKEY+"-scroll", String(window.scrollY));
+    sessionStorage.setItem(LSKEY+"-ui", JSON.stringify(ui));
+  } catch(e){}
+  artifact.publish(buildDoc()).catch(function(err){
+    var c = err && err.code;
+    if (c === "conflict") return;                       // все вкладки уже перезагружаются
+    if (c === "rate_limited") { timer = setTimeout(publish, 5000); return; }
+    if (c === "not_writer" || c === "not_granted" || c === "not_declared"
+        || c === "capability_disabled" || c === "capability_removed") {
+      artifact = null; mode = "ro"; status("ro"); return;
+    }
+    status("local");
+    toast("Общая версия недоступна — отметки сохранены локально");
+  });
+}
+
+/* ---------- экспорт ---------- */
+function csvCell(v){ return '"' + String(v == null ? "" : v).replace(/"/g, '""') + '"'; }
+function selectedCsv(){
+  var out = [["язык","кластер","запрос","мир","США / мир без РФ","CPC, $","конкуренция","заметка"]
+    .map(csvCell).join(",")];
+  ["en","ru"].forEach(function(lang){
+    DATA[lang].rows.forEach(function(r){
+      if (!picked.has(id(lang, r.k))) return;
+      out.push([lang === "en" ? "английский" : "русский", r.c, r.k, (r.w != null ? r.w : ""),
+        r.u, r.cpc.toFixed(2), r.comp, (r.n || "")].map(csvCell).join(","));
+    });
+  });
+  return out.join("\r\n");
+}
+function allKeys(){
+  return DATA.en.rows.map(function(r){ return "en:" + r.k; })
+    .concat(DATA.ru.rows.map(function(r){ return "ru:" + r.k; }));
+}
+function encodePicks(){
+  var all = allKeys(), bytes = new Uint8Array(Math.ceil(all.length / 8));
+  all.forEach(function(k, i){ if (picked.has(k)) bytes[i >> 3] |= (1 << (i & 7)); });
+  var bin = "";
+  for (var i = 0; i < bytes.length; i++) bin += String.fromCharCode(bytes[i]);
+  return btoa(bin).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+}
+function decodePicks(s){
+  try {
+    var bin = atob(s.replace(/-/g, "+").replace(/_/g, "/"));
+    var all = allKeys(), out = new Set();
+    all.forEach(function(k, i){
+      var b = bin.charCodeAt(i >> 3) || 0;
+      if (b & (1 << (i & 7))) out.add(k);
+    });
+    return out;
+  } catch(e){ return null; }
+}
+function shareUrl(){
+  return location.origin + location.pathname + location.search + "#s=" + encodePicks();
+}
+function toast(msg){
+  var el = document.getElementById("toast");
+  el.textContent = msg; el.classList.add("show");
+  clearTimeout(toast._t); toast._t = setTimeout(function(){ el.classList.remove("show"); }, 2600);
+}
+
+/* ---------- разметка страницы ---------- */
+function shell(){
+  return ''
++ '<div class="wrap">'
++ '<header class="masthead">'
++ '<div class="eyebrow"><span class="dot"></span>Google Keyword Planner · замер 28 августа 2026</div>'
++ '<h1>Семантическое ядро <em>roomora.ai</em></h1>'
++ '<p class="lede">163 ключа из 13 945 собранных идей, разложенные по кластерам. '
++ 'Отмечайте галочками то, что берём в ядро — счётчик сверху показывает, сколько трафика вы уже набрали.</p>'
++ '<div class="meta"><span>Английский — <b>105</b> ключей</span><span>Русский — <b>58</b></span>'
++ '<span>Источник — Google Ads API, наш MCC</span></div>'
++ '</header>'
+
++ '<div class="brief">'
++ '<div class="card"><span class="big">40 500</span><h3>Планировки — крупнейший спрос</h3>'
++ '<p><code>floor plan creator</code> в США даёт вшестеро больше, чем <code>ai interior design</code> (6 600). '
++ 'Фича в бете, страницы под неё нет вообще.</p></div>'
++ '<div class="card"><span class="big">22 200</span><h3>Один стиль — целая ниша</h3>'
++ '<p><code>japandi</code> в США, 110 000 в мире. И это один стиль из ваших 130+. '
++ 'Десять шаблонных галерей дают больше трафика, чем вся коммерческая часть ядра.</p></div>'
++ '<div class="card"><span class="big">$12.3</span><h3>Риелторы платят больше всех</h3>'
++ '<p>Клик по <code>virtual staging</code> стоит дороже всего в ядре. Кандидат не только на страницу, '
++ 'но и на отдельный тариф — в Studio за $39 про недвижимость нет ни слова.</p></div>'
++ '</div>'
+
++ '<div class="note"><b>Почему две колонки у английского.</b> Мировой объём в этой нише раздут Индией, '
++ 'где подписку за $9–39 не покупают: <code>house front design</code> — 90 500 в мире и 1 300 в США. '
++ 'Приоритет ставим по США.<br><br>'
++ '<b>Русские цифры — это мир без России.</b> Google Ads не работает в РФ и Keyword Planner отклоняет '
++ 'страну на уровне API. Это нижняя граница спроса, а не спрос: перед решением по русской версии '
++ 'ключи надо прогнать через Яндекс.Вордстат.</div>'
++ '</div>'
+
++ '<div class="bar"><div class="wrap"><div class="bar-in">'
++ '<div class="tabs" role="tablist">'
++ '<button class="tab" role="tab" data-lang="en">Английский</button>'
++ '<button class="tab" role="tab" data-lang="ru">Русский</button></div>'
++ '<label class="search"><svg width="14" height="14" viewBox="0 0 14 14" fill="none">'
++ '<circle cx="6" cy="6" r="4.6" stroke="currentColor" stroke-width="1.6"/>'
++ '<path d="M9.6 9.6L13 13" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>'
++ '<input id="q" type="search" placeholder="Поиск по запросу, заметке или кластеру" autocomplete="off"></label>'
++ '<button class="btn" id="only">Только выбранные</button>'
++ '<div class="tally" id="tally"></div>'
++ '<button class="btn" id="link">Ссылка с выбором</button>'
++ '<button class="btn" id="copy">Скопировать</button>'
++ '<button class="btn primary" id="dl">Скачать CSV</button>'
++ '<span class="status" id="status"><i></i></span>'
++ '</div></div></div>'
+
++ '<div class="wrap"><div id="banner" hidden></div><div id="ledger"></div>'
+
++ '<section class="section"><h2>Карта <em>страниц</em></h2>'
++ '<p>Один кластер — одна посадочная. Сейчас у сайта одна страница на всё, и она физически не может '
++ 'ранжироваться одновременно по ai interior design, floor plan creator и virtual staging: это три разных интента.</p>'
++ '<div class="maplist">'
++ '<div class="maprow head"><span>Страница</span><span>Главный ключ</span><b>США/мес</b></div>'
++ '<div class="maprow"><code>/floor-plan-ai</code><span>floor plan creator</span><b>40 500</b></div>'
++ '<div class="maprow"><code>/styles/japandi</code><span>japandi</span><b>22 200</b></div>'
++ '<div class="maprow"><code>/ideas/bathroom</code><span>bathroom ideas</span><b>27 100</b></div>'
++ '<div class="maprow"><code>/ai-interior-design</code><span>ai room design + ai home design</span><b>14 700</b></div>'
++ '<div class="maprow"><code>/interior-design-app</code><span>interior design app</span><b>6 600</b></div>'
++ '<div class="maprow"><code>/virtual-staging</code><span>virtual staging</span><b>4 400</b></div>'
++ '<div class="maprow"><code>/exterior-design</code><span>exterior home design</span><b>3 600</b></div>'
++ '</div></section>'
+
++ '<section class="section"><h2>Что <em>не берём</em></h2>'
++ '<p><b>Индийский трафик по фасадам:</b> house front design (90 500 в мире / 1 300 в США), '
++ 'latest front door design (49 500 / 260). Ранжироваться легко, платить за подписку оттуда не будут.</p>'
++ '<p><b>Страницы «alternative».</b> Проверено отдельно: planner 5d alternative — 30 запросов в месяц в США, '
++ 'homestyler alternative — 10, reroom ai alternative — 10. Стандартный SaaS-приём в этой нише не работает: '
++ 'замену по имени здесь не ищут.</p>'
++ '<p><b>houzz (110 000 в США)</b> — не наш интент: там ищут подрядчика и каталог товаров, '
++ 'а не инструмент визуализации. <b>Курсы, зарплаты и вакансии дизайнеров</b> отфильтрованы при сборе.</p>'
++ '</section>'
+
++ '<footer>Замер: Google Keyword Planner через Google Ads API, среднее число запросов в месяц. '
++ 'CPC — верхняя ставка за клик в топе выдачи по США. Русский язык снят без России: Google Ads там не работает '
++ 'и Planner отклоняет страну на уровне API.<br>'
++ 'Отмеченное выгружается кнопкой «Скачать CSV» — этим файлом удобно обменяться с коллегами '
++ 'и собрать общий список.<br>'
++ 'Исходные выгрузки, скрипты замера и версия в Markdown лежат в папке «Roomora SEO».</footer>'
++ '</div><div class="toast" id="toast"></div>';
+}
+
+/* ---------- запуск ---------- */
+document.getElementById("root").innerHTML = shell();
+document.getElementById("q").value = ui.q;
+paint();
+status("local");
+
+try {
+  var sy = sessionStorage.getItem(LSKEY+"-scroll");
+  if (sy) { window.scrollTo(0, parseInt(sy, 10) || 0); sessionStorage.removeItem(LSKEY+"-scroll"); }
+} catch(e){}
+
+document.getElementById("ledger").addEventListener("click", function(e){
+  var all = e.target.closest(".cluster-all");
+  if (all) {
+    var cl = all.dataset.all;
+    var items = rows().filter(function(r){ return r.c === cl && visible(r); });
+    var on = items.every(function(r){ return picked.has(id(ui.lang, r.k)); });
+    items.forEach(function(r){ on ? picked.delete(id(ui.lang, r.k)) : picked.add(id(ui.lang, r.k)); });
+    persist(); ui.only ? paint() : softPaint(); return;
+  }
+  var row = e.target.closest(".row");
+  if (!row) return;
+  var key = id(ui.lang, row.dataset.k);
+  picked.has(key) ? picked.delete(key) : picked.add(key);
+  persist(); ui.only ? paint() : softPaint();
+});
+document.getElementById("ledger").addEventListener("keydown", function(e){
+  if (e.key !== " " && e.key !== "Enter") return;
+  var row = e.target.closest(".row");
+  if (!row) return;
+  e.preventDefault(); row.click();
+});
+document.querySelectorAll(".tab").forEach(function(b){
+  b.addEventListener("click", function(){ ui.lang = b.dataset.lang;
+    try { sessionStorage.setItem(LSKEY+"-ui", JSON.stringify(ui)); } catch(e){}
+    paint(); });
+});
+document.getElementById("q").addEventListener("input", function(e){ ui.q = e.target.value; paint(); });
+document.getElementById("only").addEventListener("click", function(){ ui.only = !ui.only; paint(); });
+
+function copyFallback(text){
+  try {
+    var ta = document.createElement("textarea");
+    ta.value = text;
+    ta.setAttribute("readonly", "");
+    ta.style.cssText = "position:fixed;top:-1000px;opacity:0";
+    document.body.appendChild(ta);
+    ta.select(); ta.setSelectionRange(0, text.length);
+    var ok = document.execCommand("copy");
+    ta.remove();
+    return ok;
+  } catch(e){ return false; }
+}
+document.getElementById("copy").addEventListener("click", function(){
+  if (!picked.size) { toast("Сначала отметьте ключи галочками"); return; }
+  var text = selectedCsv(), n = picked.size;
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(text).then(function(){
+      toast("Скопировано: " + n + " ключей");
+    }, function(){
+      toast(copyFallback(text) ? "Скопировано: " + n + " ключей"
+                               : "Браузер не дал доступ к буферу обмена");
+    });
+  } else {
+    toast(copyFallback(text) ? "Скопировано: " + n + " ключей"
+                             : "Браузер не дал доступ к буферу обмена");
+  }
+});
+function linkDownload(csv){
+  try {
+    var a = document.createElement("a");
+    a.href = URL.createObjectURL(new Blob([csv], { type: "text/csv;charset=utf-8" }));
+    a.download = "roomora-core-selected.csv";
+    document.body.appendChild(a); a.click();
+    setTimeout(function(){ URL.revokeObjectURL(a.href); a.remove(); }, 1000);
+    toast("Файл скачан");
+  } catch(e){ toast("Не удалось скачать — используйте «Скопировать»"); }
+}
+document.getElementById("dl").addEventListener("click", function(){
+  if (!picked.size) { toast("Сначала отметьте ключи галочками"); return; }
+  var csv = "\ufeff" + selectedCsv();
+  if (!window.claude || !claude.use) { linkDownload(csv); return; }
+  claude.use("downloads").then(function(d){
+    if (!d) { linkDownload(csv); return; }
+    return d.save({ filename: "roomora-core-selected.csv", data: csv })
+      .then(function(){ toast("Файл сохранён"); })
+      .catch(function(err){ if (err && err.code !== "declined") linkDownload(csv); });
+  }).catch(function(){ linkDownload(csv); });
+});
+
+document.getElementById("link").addEventListener("click", function(){
+  var url = shareUrl(), n = picked.size;
+  var done = function(){ toast(n ? "Ссылка с " + n + " отмеченными ключами скопирована"
+                                : "Ссылка скопирована (ничего не отмечено)"); };
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(url).then(done, function(){
+      copyFallback(url) ? done() : showLink(url);
+    });
+  } else { copyFallback(url) ? done() : showLink(url); }
+});
+function showLink(url){
+  var el = document.getElementById("banner");
+  el.hidden = false;
+  el.innerHTML = '<span>Скопируйте ссылку вручную — браузер не дал доступ к буферу обмена:</span>';
+  var inp = document.createElement("input");
+  inp.readOnly = true; inp.value = url;
+  inp.style.cssText = "flex:2;min-width:260px;border:1px solid var(--line);border-radius:999px;"
+    + "padding:8px 14px;font:inherit;font-size:12.5px;background:var(--surface);color:var(--ink)";
+  el.appendChild(inp);
+  inp.focus(); inp.select();
+}
+
+/* выбор, пришедший в ссылке */
+function applyHash(){
+  var m = /[#&]s=([A-Za-z0-9\-_]+)/.exec(location.hash);
+  if (!m) return;
+  var incoming = decodePicks(m[1]);
+  if (!incoming) return;
+  var mine = new Set(picked);
+  picked = incoming;
+  paint();
+  var el = document.getElementById("banner");
+  el.hidden = false;
+  el.innerHTML = '<span>Открыт выбор из ссылки — <b>' + incoming.size + '</b> ключей.'
+    + (mine.size ? ' Ваш прежний выбор (' + mine.size + ') сохранён.' : '') + '</span>'
+    + (mine.size ? '<button class="btn" id="merge">Объединить с моим</button>' : '')
+    + '<button class="btn" id="keep">Оставить выбор из ссылки</button>';
+  var close = function(){ el.hidden = true; history.replaceState(null, "", location.pathname + location.search); };
+  if (mine.size) document.getElementById("merge").addEventListener("click", function(){
+    mine.forEach(function(k){ picked.add(k); });
+    persist(); paint(); close();
+    toast("Объединено: " + picked.size + " ключей");
+  });
+  document.getElementById("keep").addEventListener("click", function(){
+    persist(); paint(); close();
+  });
+}
+applyHash();
+window.addEventListener("hashchange", applyHash);
+
+if (window.claude && claude.use) {
+  claude.use("artifact").then(function(a){
+    if (!a) return;
+    artifact = a; mode = "shared"; status("live");
+  }).catch(function(){});
+}
+})();
+
+</script>
+
+</body>
+</html>
