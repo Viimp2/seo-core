@@ -446,7 +446,7 @@ function shell(){
 + '<h1>Семантическое ядро <em>roomora.ai</em></h1>'
 + '<p class="lede">' + (DATA.en.rows.length + DATA.ru.rows.length) + ' ключей, отобранных из '
 + fmt(DATA.meta.sources) + ' идей Planner и автоподсказок Google, разложенные по кластерам. '
-+ 'Галочки уже расставлены по моей рекомендации — снимайте то, что не подходит. '
++ 'Галочки уже расставлены — снимите то, что не подходит, и нажмите «Готово». '
 + 'Счётчик сверху показывает, сколько трафика остаётся в отмеченном.</p>'
 + '<div class="meta"><span>Английский — <b>' + DATA.en.rows.length + '</b> ключей</span>'
 + '<span>Русский — <b>' + DATA.ru.rows.length + '</b></span>'
@@ -484,9 +484,9 @@ function shell(){
 + '<input id="q" type="search" placeholder="Поиск по запросу, заметке или кластеру" autocomplete="off"></label>'
 + '<button class="btn" id="only">Только выбранные</button>'
 + '<div class="tally" id="tally"></div>'
-+ '<button class="btn" id="link">Ссылка с выбором</button>'
 + '<button class="btn" id="copy">Скопировать</button>'
-+ '<button class="btn primary" id="dl">Скачать CSV</button>'
++ '<button class="btn" id="dl">Скачать CSV</button>'
++ '<button class="btn primary" id="done">Готово — отправить</button>'
 + '<span class="status" id="status"><i></i></span>'
 + '</div></div></div>'
 
@@ -615,15 +615,39 @@ document.getElementById("dl").addEventListener("click", function(){
   }).catch(function(){ linkDownload(csv); });
 });
 
-document.getElementById("link").addEventListener("click", function(){
-  var url = shareUrl(), n = picked.size;
-  var done = function(){ toast(n ? "Ссылка с " + n + " отмеченными ключами скопирована"
-                                : "Ссылка скопирована (ничего не отмечено)"); };
+function mailtoUrl(url, n){
+  var to = ["fonderkin", "gmail.com"].join("@");
+  return "mailto:" + to
+    + "?subject=" + encodeURIComponent("Семантическое ядро roomora.ai — мой выбор")
+    + "&body=" + encodeURIComponent("Отметил " + n + " ключей.\n\nСсылка с моим выбором:\n" + url
+        + "\n\n(открой её и нажми «Объединить с моим»)");
+}
+function showDone(url){
+  var n = picked.size;
+  var el = document.getElementById("banner");
+  el.hidden = false;
+  el.innerHTML = '<span><b>Готово: ' + n + ' ключей.</b> Ссылка с вашим выбором скопирована — '
+    + 'отправьте её Славе в почту или мессенджер. Без этого ваши правки останутся только у вас.</span>';
+  var inp = document.createElement("input");
+  inp.readOnly = true; inp.value = url;
+  inp.style.cssText = "flex:2;min-width:240px;border:1px solid var(--line);border-radius:999px;"
+    + "padding:8px 14px;font:inherit;font-size:12.5px;background:var(--surface);color:var(--ink)";
+  inp.addEventListener("focus", function(){ inp.select(); });
+  el.appendChild(inp);
+  var mail = document.createElement("a");
+  mail.className = "btn"; mail.textContent = "Написать письмо";
+  mail.href = mailtoUrl(url, n);
+  mail.style.textDecoration = "none";
+  el.appendChild(mail);
+  el.scrollIntoView({ block: "center", behavior: "smooth" });
+}
+document.getElementById("done").addEventListener("click", function(){
+  if (!picked.size) { toast("Не отмечено ни одного ключа — снимите лишнее, но что-то оставьте"); return; }
+  var url = shareUrl();
   if (navigator.clipboard && navigator.clipboard.writeText) {
-    navigator.clipboard.writeText(url).then(done, function(){
-      copyFallback(url) ? done() : showLink(url);
-    });
-  } else { copyFallback(url) ? done() : showLink(url); }
+    navigator.clipboard.writeText(url).then(function(){ showDone(url); },
+                                           function(){ copyFallback(url); showDone(url); });
+  } else { copyFallback(url); showDone(url); }
 });
 function showLink(url){
   var el = document.getElementById("banner");
